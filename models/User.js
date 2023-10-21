@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    otp: {
+        type : String ,
+        unique: true
+    }
 });
 
 userSchema.pre('save', async function (next) {

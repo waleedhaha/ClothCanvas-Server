@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const userPreferences = require('../models/UserPreferences'); // Adjust the path as necessary
+
 
 // Configure nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -89,72 +91,33 @@ router.post('/signin', async (req, res) => {
   if (!email || !password) {
     return res.status(422).json({ error: "Please add email or password" });
   }
-  const savedUser = await User.findOne({ email: email })
-
-  if (!savedUser) {
-    return res.status(422).json({ error: "Invalid Credentials" });
-  }
 
   try {
-    bcrypt.compare(password, savedUser.password, (err, result) => {
-      if (result) {
-        console.log("Password matched");
-        const token = jwt.sign({ _id: savedUser._id }, process.env.jwt_secret);
-        res.send({ token });
-      }
-      else {
-        console.log('Password does not match');
-        return res.status(422).json({ error: "Invalid Credentials" });
-      }
-    })
-  }
-  catch (err) {
-    console.log(err);
-  }
-})
+    const savedUser = await User.findOne({ email: email });
+    if (!savedUser) {
+      return res.status(422).json({ error: "Invalid Credentials" });
+    }
 
-// User Preferences Model
-const UserPreferences = mongoose.model('UserPreferences', {
-  name: String,
-  age: Number,
-  dob: Date,
-  height: Number,
-  occupation: String,
-  weight: Number,
-  bodyType: String,
-  skinTone: String,
-});
+    const isPasswordMatch = await bcrypt.compare(password, savedUser.password);
+    if (!isPasswordMatch) {
+      console.log('Password does not match');
+      return res.status(422).json({ error: "Invalid Credentials" });
+    }
 
-router.post('/user-preferences', async (req, res) => {
-  const { name, age, dob, height, occupation, weight, bodyType, skinTone } = req.body;
+    // Check if user's preferences exist
+    const preferencesExist = await userPreferences.exists({ userId: savedUser._id });
+    const token = jwt.sign({ _id: savedUser._id }, process.env.jwt_secret);
 
-  const userPreferences = new UserPreferences({
-    name,
-    age,
-    dob,
-    height,
-    occupation,
-    weight,
-    bodyType,
-    skinTone
-  });
+    res.send({ 
+      token,
+      detailsFilled: !!preferencesExist // Convert to boolean
+    });
 
-  try {
-    await userPreferences.save();
-    res.status(201).json(userPreferences);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-router.get('/user-preferences', async (req, res) => {
-  try {
-    const preferences = await UserPreferences.find();
-    res.json(preferences);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 module.exports = router;

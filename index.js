@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');  // Add this line
 
-const port = 1707;
+const port = 3000;
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -46,6 +46,6 @@ app.use('/user-wardrobe',  userWardrobe);
 
 app.use('/uploadFile', uploadImage);
 
-app.listen(port, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${port}`);
 });

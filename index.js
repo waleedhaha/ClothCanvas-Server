@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');  // Add this line
 
-const port = 3000;
+const port = 1707;
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -22,6 +22,9 @@ const userWardrobe = require('./routes/userWardrobe')
 
 
 
+app.get('/test', requireToken, (req, res) => {
+  res.json({msg:"Server is running"});
+});
 
 app.use(bodyParser.json());
 app.use(cors());  // Use CORS middleware

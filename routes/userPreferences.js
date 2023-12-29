@@ -2,8 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const UserPreferences = require("../models/UserPreferences"); // adjust the path as necessary
+const User = require("../models/User"); // adjust the path as necessary
+
 
 router.post("/", async (req, res) => {
+  // get user_id from jwt token;
+  // const userId = ""
   const {
     name,
     age,
@@ -14,6 +18,7 @@ router.post("/", async (req, res) => {
     bodyType,
     skinTone,
     userId,
+    setIsFilledUserFlag
   } = req.body;
 
   const userPreferences = new UserPreferences({
@@ -30,6 +35,9 @@ router.post("/", async (req, res) => {
 
   try {
     await userPreferences.save();
+    if(setIsFilledUserFlag){
+     await User.findByIdAndUpdate(userId, { detailsFilled: true })
+    }
     res.status(201).json(userPreferences);
   } catch (err) {
     console.log(err);

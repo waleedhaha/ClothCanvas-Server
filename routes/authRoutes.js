@@ -47,8 +47,13 @@ router.post('/signup', async (req, res) => {
     verificationCode,
     otp
   })
-
+  console.log("user", user)
   try {
+    const userAlreadyExists = await User.findOne({ email: email });
+    if (userAlreadyExists) {
+      console.log("User already exists with this email");
+      return res.status(422).json({ error: "User already exists with this email" });
+    }
     const savedUser = await user.save();
     console.log(savedUser)
     const token = jwt.sign({ _id: savedUser._id }, process.env.jwt_secret);
@@ -108,11 +113,13 @@ router.post('/signin', async (req, res) => {
 
     // Check if user's preferences exist
     const preferencesExist = await userPreferences.exists({ userId: savedUser._id });
+
     const token = jwt.sign({ _id: savedUser._id }, process.env.jwt_secret);
 
     res.send({ 
       token,
-      detailsFilled: !!preferencesExist // Convert to boolean
+      detailsFilled: !!preferencesExist, // Convert to boolean
+      user: savedUser
     });
 
   } catch (err) {

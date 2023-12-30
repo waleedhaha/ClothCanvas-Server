@@ -129,4 +129,33 @@ router.post('/signin', async (req, res) => {
 });
 
 
+router.get('/get-user',async (req, res) => {
+    // Extract the token from the request headers, query params, or wherever it is stored
+    const token = req.headers.authorization; // Example: Bearer <token>
+  
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  
+    try {
+      // Verify and decode the token
+      const decoded = jwt.verify(token.split(' ')[1], process.env.jwt_secret);
+  
+      // The user ID is now available in the `decoded` object
+      const userId = decoded._id;
+  
+      // You can use the user ID to retrieve the user information from your database
+      // Replace the following line with your logic to fetch user details from the database
+      const user =  await User.findById({ _id: userId });
+      if(user) res.json({ user });
+      else {
+        res.json({data:null, msg:"User not found"})
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+})
+
+
 module.exports = router;

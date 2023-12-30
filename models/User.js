@@ -22,7 +22,11 @@ const userSchema = new mongoose.Schema({
     detailsFilled: {
         type: Boolean,
         default: false
-    }
+    },
+    avatarUrl: {
+        type: String,
+        default: null,
+    },
 });
 
 userSchema.pre('save', async function (next) {

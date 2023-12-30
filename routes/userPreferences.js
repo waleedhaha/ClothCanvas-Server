@@ -17,6 +17,7 @@ router.post("/", async (req, res) => {
     weight,
     bodyType,
     skinTone,
+    avatarUrl,
     userId,
     setIsFilledUserFlag
   } = req.body;
@@ -35,8 +36,8 @@ router.post("/", async (req, res) => {
 
   try {
     await userPreferences.save();
-    if(setIsFilledUserFlag){
-     await User.findByIdAndUpdate(userId, { detailsFilled: true })
+    if (setIsFilledUserFlag && avatarUrl) {
+     await User.findByIdAndUpdate(userId, { detailsFilled: true, avatarUrl })
     }
     res.status(201).json(userPreferences);
   } catch (err) {

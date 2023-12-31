@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: "tahoorp@gmail.com",
-    pass: "pmpb ouew tnmv pmti",
+    pass: "pmcn xwhd fggz bclu",
   },
 });
 
@@ -45,7 +45,7 @@ router.post('/signup', async (req, res) => {
     email,
     password,
     verificationCode,
-    otp
+    otp: Math.floor(100000 + Math.random() * 900000)
   })
   console.log("user", user)
   try {
@@ -65,6 +65,7 @@ router.post('/signup', async (req, res) => {
 
 router.post('/verify', (req, res) => {
   const { name, email, password } = req.body;
+  console.log("req.body", req.body)
   if (!name || !email || !password) {
     return res.status(422).json({ error: "Please add all the fields" });
   }

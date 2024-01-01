@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');  // Add this line
-
+//const axios = require('axios');
 const port = 3000;
 const app = express();
 const bodyParser = require('body-parser');
@@ -12,7 +12,7 @@ const authRoutes = require('./routes/authRoutes');
 const requireToken = require('./Middlewarss/AuthTokenRequired')
 
 const uploadImage = require('./routes/uploadimage')
-
+const WeatherApi = require('./routes/WeatherApi')
 const userPreferences = require('./routes/userPreferences')
 const userStyles = require('./routes/userStyles')
 const categories = require('./routes/category')
@@ -36,7 +36,7 @@ app.get('/', requireToken, (req, res) => {
   console.log(req.user);
   res.send(req.user);
 });
-
+app.use('/weather', WeatherApi);
 app.use('/user-preferences',  userPreferences);
 app.use('/user-styles',  userStyles);
 app.use('/categories',  categories);

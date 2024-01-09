@@ -4,7 +4,7 @@ const cors = require('cors');
 const router = express.Router();
 router.use(cors()); // Enable CORS for frontend requests
 
-const API_KEY = 'e59670929ee1c72a507d8a62b00b5cd5'; // Your OpenWeatherMap API key
+const API_KEY = 'a41f69669a5b403c8e475437240201'; // Your OpenWeatherMap API key
 
 router.get('/', async (req, res) => {
     const { lat, lon } = req.query;
@@ -14,7 +14,8 @@ router.get('/', async (req, res) => {
 
     try {
         // Correct URL format for OpenWeatherMap API
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+        const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${lat},${lon}`;
+
         console.log("Requesting weather data from URL:", url);
 
         const response = await axios.get(url);

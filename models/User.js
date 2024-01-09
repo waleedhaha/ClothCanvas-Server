@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        unique: true,
     },
     email: {
         type: String,
@@ -16,8 +17,8 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     otp: {
-        type : String ,
-        unique: true
+        type: String,
+        unique: true,
     },
     detailsFilled: {
         type: Boolean,
@@ -27,18 +28,28 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    following: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    pendingFollowRequests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FollowRequest'
+    }]
 });
 
 userSchema.pre('save', async function (next) {
     const user = this;
-    console.log("Just before hashing", user.password);
     if (!user.isModified('password')) {
         return next();
     }
     try {
         const hashedPassword = await bcrypt.hash(user.password, 8);
-        user.password = hashedPassword; // Assign to user.password
-        console.log("Just before saving", user.password);
+        user.password = hashedPassword;
         next();
     } catch (error) {
         return next(error);

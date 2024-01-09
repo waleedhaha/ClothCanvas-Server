@@ -18,6 +18,10 @@ const userStyles = require('./routes/userStyles')
 const categories = require('./routes/category')
 const subCategories = require('./routes/subCategory')
 const userWardrobe = require('./routes/userWardrobe')
+const discover = require('./routes/discover')
+const followRequest = require('./routes/followRequest')
+const friendswardrobe = require('./routes/friendswardrobe')
+
 
 
 
@@ -42,6 +46,10 @@ app.use('/user-styles',  userStyles);
 app.use('/categories',  categories);
 app.use('/subcategories',  subCategories);
 app.use('/user-wardrobe',  userWardrobe);
+app.use('/discover',  discover);
+app.use('/follow-request',  followRequest);
+app.use('/friends-wardrobe',  friendswardrobe);
+
 
 
 app.use('/uploadFile', uploadImage);

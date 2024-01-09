@@ -39,29 +39,40 @@ async function mailer(recipientEmail, code) {
 
 router.post('/signup', async (req, res) => {
   const { name, email, password, verificationCode, otp } = req.body;
-  console.log("verificationCode", verificationCode)
-  const user = new User({
-    name,
-    email,
-    password,
-    verificationCode,
-    otp: Math.floor(100000 + Math.random() * 900000)
-  })
-  console.log("user", user)
+
   try {
-    const userAlreadyExists = await User.findOne({ email: email });
-    if (userAlreadyExists) {
+    // Check if the user already exists with the provided email
+    const userWithEmail = await User.findOne({ email: email });
+    if (userWithEmail) {
       console.log("User already exists with this email");
       return res.status(422).json({ error: "User already exists with this email" });
     }
+
+    // Check if the user already exists with the provided username
+    const userWithUsername = await User.findOne({ name: name });
+    if (userWithUsername) {
+      console.log("User already exists with this username");
+      return res.status(422).json({ error: "User already exists with this username" });
+    }
+
+    // If both email and username are unique, proceed with user creation
+    const user = new User({
+      name,
+      email,
+      password,
+      verificationCode,
+      otp: Math.floor(100000 + Math.random() * 900000)
+    });
+
     const savedUser = await user.save();
-    console.log(savedUser)
     const token = jwt.sign({ _id: savedUser._id }, process.env.jwt_secret);
     res.send({ message: "User Registered Successfully", token });
   } catch (err) {
     console.log("err", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-})
+});
+
 
 router.post('/verify', (req, res) => {
   const { name, email, password } = req.body;
@@ -93,7 +104,7 @@ router.post('/verify', (req, res) => {
       }
     })
 })
-
+    //here is the error 
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -103,13 +114,12 @@ router.post('/signin', async (req, res) => {
   try {
     const savedUser = await User.findOne({ email: email });
     if (!savedUser) {
-      return res.status(422).json({ error: "Invalid Credentials" });
+      return res.status(422).json({ error: "Email Not Found" });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, savedUser.password);
     if (!isPasswordMatch) {
-      console.log('Password does not match');
-      return res.status(422).json({ error: "Invalid Credentials" });
+      return res.status(422).json({ error: "Incorrect Password" });
     }
 
     // Check if user's preferences exist
@@ -128,6 +138,7 @@ router.post('/signin', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 router.get('/get-user',async (req, res) => {
